@@ -10,19 +10,22 @@ __all__ = ['vega']
 vega_path = os.path.join(os.path.dirname(__file__), 'data',
                          'alpha_lyr_stis_008.fits')
 
+# https://classic.sdss.org/dr7/algorithms/sdssUBVRITransform.html#vega_sun_colors
 mags_path = os.path.join(os.path.dirname(__file__), 'data', 'mags', 'vega.json')
 
 
 class Vega(object):
     def __init__(self):
+        # TODO: lazy load
         vega = fits.getdata(vega_path)
         self.wavelength = vega['WAVELENGTH'] * u.Angstrom
-        self.flux = vega['FLUX'] * u.erg / u.s / u.cm**2 / u.Angstrom
+        self.flam = vega['FLUX'] * u.erg / u.s / u.cm**2 / u.Angstrom
+        self._mags = None
 
     def plot(self, ax=None):
         if ax is None:
             fig, ax = plt.subplots()
-        ax.semilogx(self.wavelength, self.flux)
+        ax.semilogx(self.wavelength, self.flam)
         ax.set(xlabel='Wavelength [Angstrom]',
                ylabel=r'$F_\lambda$ [{0}]'.format(self.flux.unit))
         return ax
@@ -31,10 +34,12 @@ class Vega(object):
         interp_transmissivity = np.interp(self.wavelength, filter.wavelength,
                                           filter.transmissivity,
                                           left=0, right=0)
-        flux = self.flux * self.wavelength * interp_transmissivity
+        flux = self.flam * self.wavelength * interp_transmissivity
         return np.sum(flux)
 
     def mag(self, filter_name):
-        return load(open(mags_path))[filter_name]
+        if self._mags is None:
+            self._mags = load(open(mags_path))
+        return self._mags[filter_name]
 
 vega = Vega()

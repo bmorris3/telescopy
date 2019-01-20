@@ -8,7 +8,7 @@ __all__ = ['Telescope', 'Target']
 
 
 def relative_flux(m1, m2):
-    return 10**(-0.4 * (m1 - m2))
+    return 10**(0.4 * (m2 - m1))
 
 
 class Telescope(object):
@@ -21,10 +21,13 @@ class Telescope(object):
     def photons(self, target, exposure_duration):
         flux_scale = relative_flux(target.magnitude,
                                    vega.mag(target.filter.name))
-        photon = (flux_scale * vega.integrate_filter(target.filter) *
-                  np.pi * (self.aperture_diameter / 2)**2 * self.throughput)
+
+        telescope_aperture = np.pi * (self.aperture_diameter / 2)**2
+        energy = (flux_scale * vega.integrate_filter(target.filter) *
+                  telescope_aperture * self.throughput * exposure_duration)
         nu = c / target.filter.lam0
-        return int((exposure_duration * photon / (h * nu)).decompose())
+        n_photons = int((energy / (h * nu)).decompose())
+        return n_photons
 
 
 class Target(object):

@@ -11,13 +11,21 @@ filter_path = os.path.join(os.path.dirname(__file__), 'data', 'filters')
 
 
 class Filter(object):
-    def __init__(self, path, name=None):
+    def __init__(self, wavelength=None, transmissivity=None, path=None,
+                 name=None):
         self.path = path
         self.name = name
-        wavelength, transmissivity = np.loadtxt(self.path, unpack=True)
-        self.wavelength = wavelength * u.Angstrom
-        self.transmissivity = transmissivity
-        self.lam0 = np.sum(wavelength * transmissivity) / np.sum(transmissivity) * u.Angstrom
+
+        if path is not None:
+            wavelength, transmissivity = np.loadtxt(self.path, unpack=True)
+            self.wavelength = wavelength * u.Angstrom
+            self.transmissivity = transmissivity
+        else:
+            self.wavelength = wavelength
+            self.transmissivity = transmissivity
+
+        self.lam0 = (np.sum(wavelength * transmissivity) /
+                     np.sum(transmissivity) * u.Angstrom)
 
     @classmethod
     def from_name(cls, name):
@@ -25,7 +33,7 @@ class Filter(object):
         globbed_path = glob(path)
         if len(globbed_path) < 1:
             raise ValueError('No filter found matching name "{0}"'.format(name))
-        return cls(globbed_path[0], name=name)
+        return cls(path=globbed_path[0], name=name)
 
     def plot(self, ax=None):
         if ax is None:
