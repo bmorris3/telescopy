@@ -15,6 +15,9 @@ mags_path = os.path.join(os.path.dirname(__file__), 'data', 'mags', 'vega.json')
 
 
 class Vega(object):
+    """
+    Container object for the spectrum of Vega.
+    """
     def __init__(self):
         # TODO: lazy load
         vega = fits.getdata(vega_path)
@@ -23,6 +26,19 @@ class Vega(object):
         self._mags = None
 
     def plot(self, ax=None):
+        """
+        Plot Vega's flux-calibrated spectrum.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.pyplot.Axes` or None
+            Axis object.
+
+        Returns
+        -------
+        ax : `~matplotlib.pyplot.Axes`
+            Plot with spectrum  of Vega
+        """
         if ax is None:
             fig, ax = plt.subplots()
         ax.semilogx(self.wavelength, self.flam)
@@ -31,6 +47,19 @@ class Vega(object):
         return ax
 
     def integrate_filter(self, filter):
+        """
+        Integrate Vega's spectral flux density within ``filter``.
+
+        Parameters
+        ----------
+        filter : `~telescopy.Filter`
+            Filter object
+
+        Returns
+        -------
+        flux : `~astropy.units.Quantity`
+            Flux within ``filter``
+        """
         interp_transmissivity = np.interp(self.wavelength, filter.wavelength,
                                           filter.transmissivity,
                                           left=0, right=0)
@@ -38,6 +67,20 @@ class Vega(object):
         return np.sum(flux)
 
     def mag(self, filter_name):
+        """
+        Vega's magnitude in filter ``filter_name``
+
+        Parameters
+        ----------
+        filter_name : str
+            Name of filter. Must be one of the filters returned by
+            `~telescopy.Filter.available_filters()`.
+
+        Returns
+        -------
+        mag : float
+            Magnitude of Vega in ``filter_name``
+        """
         if self._mags is None:
             self._mags = load(open(mags_path))
         return self._mags[filter_name]
