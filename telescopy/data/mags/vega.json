@@ -1,0 +1,15 @@
+{
+  "Johnson_U": 0.03,
+  "Johnson_B": 0.03,
+  "Johnson_V": 0.03,
+  "Johnson_R": 0.07,
+  "Johnson_I": 0.10,
+  "2MASS_J": -0.177,
+  "2MASS_H": -0.029,
+  "2MASS_K": 0.129,
+  "SDSS_u": 0.94,
+  "SDSS_g": -0.08,
+  "SDSS_r": 0.17,
+  "SDSS_i": 0.4,
+  "SDSS_z": 0.57
+}

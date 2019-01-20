@@ -10,7 +10,7 @@ from ._astropy_init import *
 # This is the same check as the one at the top of setup.py
 import sys
 
-__minimum_python_version__ = "3.6"
+__minimum_python_version__ = "3.5"
 
 class UnsupportedPythonError(Exception):
     pass
@@ -20,4 +20,7 @@ if sys.version_info < tuple((int(val) for val in __minimum_python_version__.spli
 
 if not _ASTROPY_SETUP_:
     # For egg_info test builds to pass, put package imports here.
-    pass
+    from .telescope import *
+    from .filter import *
+    from .vega import *
+
