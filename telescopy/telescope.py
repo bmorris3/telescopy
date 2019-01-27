@@ -4,7 +4,7 @@ from astropy.constants import h, c
 
 from .vega import vega
 
-__all__ = ['Telescope', 'Target']
+__all__ = ['Telescope']
 
 
 def relative_flux(m1, m2):
@@ -28,48 +28,47 @@ class Telescope(object):
         self.aperture_diameter = aperture_diameter
         self.throughput = throughput
 
+    # @u.quantity_input(exposure_duration=u.s)
+    # def photons(self, target, exposure_duration):
+    #     """
+    #     Compute the number of photons detected in an ``exposure_duration``
+    #     exposure of ``target``.
+    #
+    #     Parameters
+    #     ----------
+    #     target : `~telescopy.Target`
+    #         Target object
+    #     exposure_duration : `~astropy.units.Quantity`
+    #         Length of the exposure
+    #
+    #     Returns
+    #     -------
+    #     n_photons : int
+    #         Number of photons observed.
+    #     """
+    #     flux_scale = relative_flux(target.magnitude,
+    #                                vega.mag(target.filter.name))
+    #
+    #     telescope_aperture = np.pi * (self.aperture_diameter / 2)**2
+    #     energy = (flux_scale * vega.integrate_filter(target.filter) *
+    #               telescope_aperture * self.throughput * exposure_duration)
+    #     nu = c / target.filter.lam0
+    #     n_photons = int(energy / (h * nu))
+    #     return n_photons
+
     @u.quantity_input(exposure_duration=u.s)
-    def photons(self, target, exposure_duration):
-        """
-        Compute the number of photons detected in an ``exposure_duration``
-        exposure of ``target``.
+    def photons(self, target, exposure_duration, filter):
+        delta_lambda = np.median(np.diff(filter.wavelength))
 
-        Parameters
-        ----------
-        target : `~telescopy.Target`
-            Target object
-        exposure_duration : `~astropy.units.Quantity`
-            Length of the exposure
+        aperture = np.pi * (self.aperture_diameter/2)**2
 
-        Returns
-        -------
-        n_photons : int
-            Number of photons observed.
-        """
-        flux_scale = relative_flux(target.magnitude,
-                                   vega.mag(target.filter.name))
+        energy_rate = (target.irradiance(filter.wavelength) * np.pi * u.sr *
+                       (target.radius/target.distance)**2 * aperture * delta_lambda)
 
-        telescope_aperture = np.pi * (self.aperture_diameter / 2)**2
-        energy = (flux_scale * vega.integrate_filter(target.filter) *
-                  telescope_aperture * self.throughput * exposure_duration)
-        nu = c / target.filter.lam0
-        n_photons = int(energy / (h * nu))
-        return n_photons
+        energy = energy_rate * exposure_duration
 
+        nu = c / filter.wavelength
+        n_photons_per_wl = (energy / (h * nu)).decompose()
 
-class Target(object):
-    """
-    Container for target metadata.
-    """
-    def __init__(self, magnitude=None, filter=None):
-        """
+        return int(self.throughput * np.sum(filter.transmissivity * n_photons_per_wl))
 
-        Parameters
-        ----------
-        magnitude : float
-            Target magnitude in ``filter``
-        filter : `~telescopy.Filter`
-            Filter object.
-        """
-        self.magnitude = magnitude
-        self.filter = filter

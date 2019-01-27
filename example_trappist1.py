@@ -1,26 +1,22 @@
 import astropy.units as u
 import matplotlib.pyplot as plt
-from telescopy import Telescope, Filter, vega, Target, Imager
+from telescopy import Telescope, Filter, BlackBody, Imager
+from astropy.constants import R_sun
 
 fig, ax = plt.subplots()
 
-# print(Filter.available_filters())
+T_eff = 2511 * u.K
+distance = 12 * u.parsec
+radius = 0.11 * R_sun
+aperture_diameter = 3.5 * u.m
+exp_time = 45 * u.s
 
-z = Filter.from_name('SDSS_z')
-target = Target(magnitude=21.42, filter=z)
-telescope = Telescope(aperture_diameter=3.5*u.m, throughput=1.0)
-arctic = Imager(plate_scale=2*0.114*u.arcsec, seeing=1*u.arcsec, binning=3,
-                quantum_efficiency=0.5, gain=2)
-
-exposure_duration = 45 * u.s
-
-image = arctic.image(telescope, target, exposure_duration)
-print('image sum:    ', image.sum())
-print('max:          ', image.max())
-print('measured:     ', 891164)
-# import matplotlib.pyplot as plt
-# plt.imshow(image)
-# plt.show()
+r = Filter.from_name('SDSS_z')
+target = BlackBody(T_eff, radius, distance)
+telescope = Telescope(aperture_diameter=aperture_diameter, throughput=0.9)
+imager = Imager(quantum_efficiency=0.8, gain=2)
+print('nphotons: \t', imager.counts(telescope, target, exp_time, r))
+print('measured: \t', 891164)
 
 # path = '/Users/bmmorris/data/Q2UW01/UT160619/trappist-1.0044.fits'
 # (img[560:600, 610:650] - np.median(img[560:600, 610:650])).sum()

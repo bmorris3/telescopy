@@ -24,4 +24,5 @@ if not _ASTROPY_SETUP_:
     from .filter import *
     from .vega import *
     from .imager import *
+    from .star import *
 

@@ -72,7 +72,7 @@ class Imager(object):
         img = gaussian_2d(x - n/2, y - n/2, 0, 0, spread) * total_counts
         return np.array(img, dtype=int)
 
-    def counts(self, telescope, target, exposure_duration):
+    def counts(self, telescope, target, exposure_duration, filter):
         """
         Number of ADU detected by the detector.
 
@@ -90,7 +90,7 @@ class Imager(object):
         total_counts : float
             Number of counts estimated in the exposure.
         """
-        total_electrons = (telescope.photons(target, exposure_duration) *
+        total_electrons = (telescope.photons(target, exposure_duration, filter) *
                            self.quantum_efficiency)
         total_counts = total_electrons / self.gain
-        return total_counts
+        return int(total_counts)
