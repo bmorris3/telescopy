@@ -17,6 +17,6 @@ class BlackBody(object):
             Distance to the blackbody
         """
 
-        self.irradiance = lambda x: blackbody_lambda(x, T_eff)
+        self.irradiance = lambda x: blackbody_lambda(x, T_eff) * u.sr
         self.radius = radius
         self.distance = distance

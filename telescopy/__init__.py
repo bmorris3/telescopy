@@ -25,4 +25,4 @@ if not _ASTROPY_SETUP_:
     from .vega import *
     from .imager import *
     from .star import *
-
+    from .skymodel import *
