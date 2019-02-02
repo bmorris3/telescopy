@@ -48,7 +48,7 @@ class Telescope(object):
         aperture = np.pi * (self.aperture_diameter/2)**2
 
         energy_rate = (target.irradiance(filter.wavelength) * sky_model_mean *
-                       (target.radius/target.distance)**2 * aperture *
+                       np.pi * u.sr * (target.radius/target.distance)**2 * aperture *
                        delta_lambda)
 
         energy = energy_rate * exposure_duration

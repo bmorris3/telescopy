@@ -1,9 +1,6 @@
 import astropy.units as u
 from astropy.constants import R_sun
-import matplotlib.pyplot as plt
 from telescopy import Telescope, Filter, BlackBody, Imager, SkyModel
-
-fig, ax = plt.subplots()
 
 T_eff = 4780 * u.K
 distance = 36 * u.parsec
@@ -12,8 +9,8 @@ aperture_diameter = 3.5 * u.m
 exp_time = 5 * u.s
 
 r = Filter.from_name('SDSS_r')
-sky = SkyModel.from_cerro_paranal()
 target = BlackBody(T_eff, radius, distance)
+sky = SkyModel.from_cerro_paranal()
 telescope = Telescope(aperture_diameter=aperture_diameter, throughput=1.0)
 imager = Imager(quantum_efficiency=1.0, gain=2)
 

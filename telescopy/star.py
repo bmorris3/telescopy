@@ -1,6 +1,5 @@
 from astropy.modeling.blackbody import blackbody_lambda
 import astropy.units as u
-import numpy as np
 
 __all__ = ['BlackBody']
 
@@ -17,6 +16,6 @@ class BlackBody(object):
             Distance to the blackbody
         """
 
-        self.irradiance = lambda x: blackbody_lambda(x, T_eff) * u.sr
+        self.irradiance = lambda x: blackbody_lambda(x, T_eff)
         self.radius = radius
         self.distance = distance

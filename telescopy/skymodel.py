@@ -20,7 +20,7 @@ class SkyModel(object):
     @classmethod
     def from_cerro_paranal(cls, airmass=1.0):
         """
-        Moehler et al. (2014, A&A 568, A9)
+        Noll et al. (2012, A&A 543, A92), Jones et al. (2013, A&A 560, A91), Moehler et al. (2014, A&A 568, A9)
 
         https://www.eso.org/observing/etc/bin/gen/form?INS.MODE=swspectr+INS.NAME=SKYCALC
         """
@@ -28,6 +28,8 @@ class SkyModel(object):
             cerro_paranal_path = cerro_paranal_X10_path
         elif airmass == 1.5:
             cerro_paranal_path = cerro_paranal_X15_path
+        else:
+            raise ValueError('`Airmass` presently only supports X=1 or 1.5.')
 
         wavelength, transmittance = np.loadtxt(cerro_paranal_path,
                                                unpack=True)
